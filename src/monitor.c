@@ -14,8 +14,12 @@
  */
 void* monitor_service(void *arg) {
     // TODO: Castear el argumento al tipo de dato correcto.
-    
+    service_t* service = (service_t *)arg;
     // TODO: Implementar la espera del proceso específico.
+    if(waitpid((*service).pid, &service->exit_status, 0) == -1) {
+        perror("Error en waitpid");
+        return NULL;
+    }
     // Ayuda: Revisar el uso de waitpid(pid, &status, 0).
 
     /* * Una vez que waitpid retorna, el proceso hijo ha cambiado de estado.
@@ -25,6 +29,17 @@ void* monitor_service(void *arg) {
      * - WIFSIGNALED: ¿Fue terminado por una señal (Segfault, OOM Killer)?
      * - WTERMSIG: ¿Qué señal lo mató?
      */
+    pthread_mutex_lock(&dashboard_mutex);
+    if(WIFEXITED(service->exit_status)) {
+        if( WEXITSTATUS(service->exit_status) == 0) {
+            service->state = STATE_STOPPED;
+        } else {
+            service->state = STATE_CRASHED;
+        }
+    } else if(WIFSIGNALED(service->exit_status)) {
+        service->state = STATE_KILLED;
+    }
+    pthread_mutex_unlock(&dashboard_mutex);
 
     /*
      * TODO: Actualizar el dashboard global.

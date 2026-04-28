@@ -110,6 +110,11 @@ int main(int argc, char *argv[]) {
          * monitoreo concurrente. 
          */
         spawn_service(i);
+        pthread_mutex_lock(&dashboard_mutex);
+        pthread_t* watchdog_thread = &dashboard[i].monitor_thread;
+        service_t* service = &dashboard[i];
+        pthread_mutex_unlock(&dashboard_mutex);
+        pthread_create(watchdog_thread, NULL, monitor_service, (void *)service);
     }
 
     // 5. Ciclo de monitoreo principal
