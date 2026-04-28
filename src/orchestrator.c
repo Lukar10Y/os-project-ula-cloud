@@ -27,15 +27,21 @@ int spawn_service(int index) {
     // - Lógica del proceso PADRE (Gestión del dashboard).
 
     if(pid == 0){
+        pthread_mutex_lock(&dashboard_mutex);
+        size_t mem = dashboard[index].mem_limit;
+        char* path = dashboard[index].path;
+        char* args[] = {dashboard[index].name, NULL};
+        pthread_mutex_unlock(&dashboard_mutex);
         apply_resource_limits(dashboard[index].mem_limit);
-        char* args = {dashboard[index].name, NULL};
-        execvp(args[0], args);
+        execvp(path, args);
         perror("Error en execvp");
         exit(EXIT_FAILURE);
     }
     else if(pid > 0){
+        pthread_mutex_lock(&dashboard_mutex);
         dashboard[index].pid = pid;
         dashboard[index].state = STATE_RUNNING;
+        pthread_mutex_unlock(&dashboard_mutex);
     }
     else{
         perror("Error en fork");

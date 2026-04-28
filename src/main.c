@@ -32,7 +32,9 @@ void print_dashboard() {
 
     // TODO: Renderizar cada fila del dashboard con la información actualizada.
     for (int i = 0; i < num_services; i++) {
-        printf("%-15s %-10d %-15s\n", dashboard[i].name, dashboard[i].pid);
+        pthread_mutex_lock(&dashboard_mutex);
+        printf("%-15s %-10d\n", dashboard[i].name, dashboard[i].pid);
+        pthread_mutex_unlock(&dashboard_mutex);
     }
     printf("==============================================================\n");
 }
@@ -87,7 +89,7 @@ int main(int argc, char *argv[]) {
     // 5. Ciclo de monitoreo principal
     while (1) {
         print_dashboard();
-        sleep(1); 
+        sleep(10); 
     }
 
     pthread_mutex_destroy(&dashboard_mutex);
