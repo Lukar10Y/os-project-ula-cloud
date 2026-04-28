@@ -14,7 +14,9 @@
 void apply_resource_limits(size_t mem_limit) {
     // TODO: Configurar la estructura rlimit y ejecutar la syscall.
     struct rlimit limits;
-    limits.rlim_cur = limits.rlim_max = mem_limit;
+    limits.rlim_cur = limits.rlim_max = mem_limit; 
+    // De manera preventida se le asigna asi para evitar que los procesos se modifiquen por si mismos.
+
     // Casos a considerar:
     // - ¿Qué diferencia hay entre rlim_cur y rlim_max?
     // - ¿Qué sucede si el límite solicitado es menor al tamaño del propio binario?
