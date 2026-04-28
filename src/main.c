@@ -58,8 +58,9 @@ void print_dashboard() {
     // TODO: Renderizar cada fila del dashboard con la información actualizada.
     for (int i = 0; i < num_services; i++) {
         pthread_mutex_lock(&dashboard_mutex);
-        printf("%-15s %-10d %-15s %-10d\n", dashboard[i].name, dashboard[i].pid, get_state(dashboard[i].state), dashboard[i].exit_status);
+        service_t service = dashboard[i];
         pthread_mutex_unlock(&dashboard_mutex);
+        printf("%-15s %-10d %-15s %-10d\n", service.name, service.pid, get_state(service.state), service.exit_status);
     }
     printf("==============================================================\n");
 }
