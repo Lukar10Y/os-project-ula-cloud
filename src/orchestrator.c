@@ -17,7 +17,7 @@
  * - Retornar el PID asignado.
  */
 int spawn_service(int index) {
-    pid_t pid;
+    pid_t pid = fork();
 
     // TODO: Invocar la creación del proceso hijo.
 
@@ -26,5 +26,14 @@ int spawn_service(int index) {
     // - Lógica del proceso HIJO (Setup de límites y Ejecución).
     // - Lógica del proceso PADRE (Gestión del dashboard).
 
-    return 0; // Cambiar por el PID real
+    if(pid == 0){
+        apply_resource_limits(dashboard[index].mem_limit);
+    }
+    else if(pid > 0){
+    }
+    else{
+        perror("Error en fork");
+        return -1;
+    }
+    return pid; // Cambiar por el PID real
 }

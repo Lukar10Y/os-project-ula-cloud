@@ -13,8 +13,13 @@
  */
 void apply_resource_limits(size_t mem_limit) {
     // TODO: Configurar la estructura rlimit y ejecutar la syscall.
-    
+    struct rlimit limits;
+    limits.rlim_cur = limits.rlim_max = mem_limit;
     // Casos a considerar:
     // - ¿Qué diferencia hay entre rlim_cur y rlim_max?
     // - ¿Qué sucede si el límite solicitado es menor al tamaño del propio binario?
+    if (setrlimit(RLIMIT_AS, &limits) == -1) {
+        perror("Error al aplicar límites en memoria");
+        exit(EXIT_FAILURE);
+    }
 }
