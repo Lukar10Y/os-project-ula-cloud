@@ -70,4 +70,6 @@ void apply_resource_limits(size_t mem_limit);
  */
 void print_dashboard();
 
+char* get_state(service_state_t state);
+
 #endif /* ULA_CLOUD_H */
