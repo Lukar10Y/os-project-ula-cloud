@@ -31,7 +31,9 @@ void print_dashboard() {
     printf("--------------------------------------------------------------\n");
 
     // TODO: Renderizar cada fila del dashboard con la información actualizada.
-
+    for (int i = 0; i < num_services; i++) {
+        printf("%-15s %-10d %-15s\n", dashboard[i].name, dashboard[i].pid);
+    }
     printf("==============================================================\n");
 }
 
@@ -79,6 +81,7 @@ int main(int argc, char *argv[]) {
         /* * TODO: Orquestar el despliegue de servicios y su posterior 
          * monitoreo concurrente. 
          */
+        spawn_service(i);
     }
 
     // 5. Ciclo de monitoreo principal

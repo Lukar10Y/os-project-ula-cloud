@@ -28,8 +28,14 @@ int spawn_service(int index) {
 
     if(pid == 0){
         apply_resource_limits(dashboard[index].mem_limit);
+        char* args = {dashboard[index].name, NULL};
+        execvp(args[0], args);
+        perror("Error en execvp");
+        exit(EXIT_FAILURE);
     }
     else if(pid > 0){
+        dashboard[index].pid = pid;
+        dashboard[index].state = STATE_RUNNING;
     }
     else{
         perror("Error en fork");
