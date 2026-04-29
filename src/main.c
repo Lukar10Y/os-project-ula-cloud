@@ -73,7 +73,16 @@ void handle_shutdown(int sig) {
     printf("\n[ULA-Cloud] Iniciando secuencia de apagado...\n");
     
     // TODO: Notificar y limpiar recursos de procesos hijos.
-    
+    if(WIFEXITED(sig)) {
+        printf("Terminó normalmente con código (%d)\n", WEXITSTATUS(sig));
+    } else if(WIFSIGNALED(sig)) {
+        int signal = WTERMSIG(sig);
+        printf("Terminado por señal (%d)\n", signal);
+    }
+    for(int i = 0; i < num_services; i++) {
+        printf("Liberando Watchdog %s (PID: %d)\n", dashboard[i].name, dashboard[i].pid);
+        pthread_join(dashboard[i].monitor_thread, NULL);
+    }
     exit(0);
 }
 

@@ -31,7 +31,7 @@ void* monitor_service(void *arg) {
      */
     pthread_mutex_lock(&dashboard_mutex);
     if(WIFEXITED(service->exit_status)) {
-        if( WEXITSTATUS(service->exit_status) == 0) {
+        if(WEXITSTATUS(service->exit_status) == 0) {
             service->state = STATE_STOPPED;
         } else {
             service->state = STATE_CRASHED;

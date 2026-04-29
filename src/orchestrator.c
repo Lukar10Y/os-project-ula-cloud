@@ -26,7 +26,7 @@ int spawn_service(int index) {
     // - Lógica del proceso HIJO (Setup de límites y Ejecución).
     // - Lógica del proceso PADRE (Gestión del dashboard).
 
-    if(pid == 0){
+    if(pid == 0) {
         pthread_mutex_lock(&dashboard_mutex);
         size_t mem = dashboard[index].mem_limit;
         char* path = dashboard[index].path;
@@ -37,13 +37,13 @@ int spawn_service(int index) {
         perror("Error en execvp");
         exit(EXIT_FAILURE);
     }
-    else if(pid > 0){
+    else if(pid > 0) {
         pthread_mutex_lock(&dashboard_mutex);
         dashboard[index].pid = pid;
         dashboard[index].state = STATE_RUNNING;
         pthread_mutex_unlock(&dashboard_mutex);
     }
-    else{
+    else {
         perror("Error en fork");
         return -1;
     }
