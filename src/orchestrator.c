@@ -32,7 +32,7 @@ int spawn_service(int index) {
         char* path = dashboard[index].path;
         char* args[] = {dashboard[index].name, NULL};
         pthread_mutex_unlock(&dashboard_mutex);
-        apply_resource_limits(dashboard[index].mem_limit);
+        apply_resource_limits(mem);
         execvp(path, args);
         perror("Error en execvp");
         exit(EXIT_FAILURE);
