@@ -29,14 +29,19 @@ void* monitor_service(void *arg) {
      * - WIFSIGNALED: ¿Fue terminado por una señal (Segfault, OOM Killer)?
      * - WTERMSIG: ¿Qué señal lo mató?
      */
+    printf("Cambio de estado detectado para %s (PID: %d)\n", service->name, service->pid);
     pthread_mutex_lock(&dashboard_mutex);
-    if(WIFEXITED(service->exit_status)) {
-        if(WEXITSTATUS(service->exit_status) == 0) {
+    int sig = service->exit_status;
+    if(WIFEXITED(sig)) {
+        if(WEXITSTATUS(sig) == 0) {
+            printf("Terminó normalmente con código (%d)\n", WEXITSTATUS(sig));
             service->state = STATE_STOPPED;
         } else {
+            printf("Terminó con error con código (%d)\n", WEXITSTATUS(sig));
             service->state = STATE_CRASHED;
         }
-    } else if(WIFSIGNALED(service->exit_status)) {
+    } else if(WIFSIGNALED(sig)) {
+        printf("Fue terminado por la señal (%d)\n", WTERMSIG(sig));
         service->state = STATE_KILLED;
     }
     pthread_mutex_unlock(&dashboard_mutex);
