@@ -74,10 +74,14 @@ void handle_shutdown(int sig) {
     
     // TODO: Notificar y limpiar recursos de procesos hijos.
     if(WIFEXITED(sig)) {
-        printf("Terminó normalmente con código (%d)\n", WEXITSTATUS(sig));
+        if(WEXITSTATUS(sig) == 0) {
+            printf("MAIN: Terminó normalmente con código (%d)\n", WEXITSTATUS(sig));
+        } else {
+            printf("MAIN:Terminó con error con código (%d)\n", WEXITSTATUS(sig));
+        }
     } else if(WIFSIGNALED(sig)) {
         int signal = WTERMSIG(sig);
-        printf("Terminado por señal (%d)\n", signal);
+        printf("MAIN: Terminado por señal (%d)\n", signal);
     }
     for(int i = 0; i < num_services; i++) {
         printf("Liberando Watchdog %s (PID: %d)\n", dashboard[i].name, dashboard[i].pid);
