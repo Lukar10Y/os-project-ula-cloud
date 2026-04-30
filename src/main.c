@@ -77,8 +77,11 @@ void handle_shutdown(int sig) {
         service_t service = dashboard[i];
         pthread_mutex_unlock(&dashboard_mutex);
         if(service.state == STATE_RUNNING) {
-            kill(service.pid, SIGTERM);
-            printf("Enviando señal de terminación a %s (PID: %d)\n", service.name, service.pid);
+            if(kill(service.pid, SIGTERM) == -1) {
+                perror("Error al enviar SIGTERM\n");
+            } else {    
+                printf("Enviando señal de terminación a %s (PID: %d)\n", service.name, service.pid);
+            }
         }
     }
     sleep(1);
