@@ -75,7 +75,6 @@ void handle_shutdown(int sig) {
     for(int i = 0; i < num_services; i++) {
         pthread_mutex_lock(&dashboard_mutex);
         service_t service = dashboard[i];
-        pthread_mutex_unlock(&dashboard_mutex);
         if(service.state == STATE_RUNNING) {
             if(kill(service.pid, SIGTERM) == -1) {
                 perror("Error al enviar SIGTERM\n");
@@ -83,6 +82,7 @@ void handle_shutdown(int sig) {
                 printf("Enviando señal de terminación a %s (PID: %d)\n", service.name, service.pid);
             }
         }
+        pthread_mutex_unlock(&dashboard_mutex);
     }
     sleep(1);
     for(int i = 0; i < num_services; i++) {

@@ -29,8 +29,8 @@ void* monitor_service(void *arg) {
      * - WIFSIGNALED: ¿Fue terminado por una señal (Segfault, OOM Killer)?
      * - WTERMSIG: ¿Qué señal lo mató?
      */
-    printf("Cambio de estado detectado para %s (PID: %d)\n", service->name, service->pid);
     pthread_mutex_lock(&dashboard_mutex);
+    printf("Cambio de estado detectado para %s (PID: %d)\n", service->name, service->pid);
     int sig = service->exit_status;
     if(WIFEXITED(sig)) {
         if(WEXITSTATUS(sig) == 0) {
