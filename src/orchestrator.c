@@ -27,6 +27,7 @@ int spawn_service(int index) {
     // - Lógica del proceso PADRE (Gestión del dashboard).
 
     if(pid == 0) {
+        setpgid(0, 0);
         pthread_mutex_lock(&dashboard_mutex);
         size_t mem = dashboard[index].mem_limit;
         char* path = dashboard[index].path;

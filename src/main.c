@@ -71,21 +71,23 @@ void print_dashboard() {
  */
 void handle_shutdown(int sig) {
     printf("\n[ULA-Cloud] Iniciando secuencia de apagado...\n");
-    
     // TODO: Notificar y limpiar recursos de procesos hijos.
-    if(WIFEXITED(sig)) {
-        if(WEXITSTATUS(sig) == 0) {
-            printf("MAIN: Terminó normalmente con código (%d)\n", WEXITSTATUS(sig));
-        } else {
-            printf("MAIN:Terminó con error con código (%d)\n", WEXITSTATUS(sig));
-        }
-    } else if(WIFSIGNALED(sig)) {
-        int signal = WTERMSIG(sig);
-        printf("MAIN: Terminado por señal (%d)\n", signal);
-    }
     for(int i = 0; i < num_services; i++) {
-        printf("Liberando Watchdog %s (PID: %d)\n", dashboard[i].name, dashboard[i].pid);
-        pthread_join(dashboard[i].monitor_thread, NULL);
+        pthread_mutex_lock(&dashboard_mutex);
+        service_t service = dashboard[i];
+        pthread_mutex_unlock(&dashboard_mutex);
+        if(service.state == STATE_RUNNING) {
+            kill(service.pid, SIGTERM);
+            printf("Enviando señal de terminación a %s (PID: %d)\n", service.name, service.pid);
+        }
+    }
+    sleep(1);
+    for(int i = 0; i < num_services; i++) {
+        pthread_mutex_lock(&dashboard_mutex);
+        service_t service = dashboard[i];
+        pthread_mutex_unlock(&dashboard_mutex);
+        printf("Liberando Watchdog %s (PID: %d)\n", service.name, service.pid);
+        pthread_join(service.monitor_thread, NULL);
     }
     exit(0);
 }
@@ -133,7 +135,7 @@ int main(int argc, char *argv[]) {
     // 5. Ciclo de monitoreo principal
     while (1) {
         print_dashboard();
-        sleep(10); 
+        sleep(1); 
     }
 
     pthread_mutex_destroy(&dashboard_mutex);
