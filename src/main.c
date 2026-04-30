@@ -58,9 +58,13 @@ void print_dashboard() {
     // TODO: Renderizar cada fila del dashboard con la información actualizada.
     for (int i = 0; i < num_services; i++) {
         pthread_mutex_lock(&dashboard_mutex);
-        service_t service = dashboard[i];
+        char name[MAX_NAME_LEN];
+        strncpy(name, dashboard[i].name, MAX_NAME_LEN);
+        pid_t pid = dashboard[i].pid;
+        service_state_t state = dashboard[i].state;
+        int exit_status = dashboard[i].exit_status;
         pthread_mutex_unlock(&dashboard_mutex);
-        printf("%-15s %-10d %-15s %-10d\n", service.name, service.pid, get_state(service.state), service.exit_status);
+        printf("%-15s %-10d %-15s %-10d\n", name, pid, get_state(state), exit_status);
     }
     printf("==============================================================\n");
 }
@@ -87,10 +91,13 @@ void handle_shutdown(int sig) {
     sleep(1);
     for(int i = 0; i < num_services; i++) {
         pthread_mutex_lock(&dashboard_mutex);
-        service_t service = dashboard[i];
+        char name[MAX_NAME_LEN];
+        strncpy(name, dashboard[i].name, MAX_NAME_LEN);
+        pid_t pid = dashboard[i].pid;
+        pthread_t monitor_thread = dashboard[i].monitor_thread;
         pthread_mutex_unlock(&dashboard_mutex);
-        printf("Liberando Watchdog %s (PID: %d)\n", service.name, service.pid);
-        pthread_join(service.monitor_thread, NULL);
+        printf("Liberando Watchdog %s (PID: %d)\n", name, pid);
+        pthread_join(monitor_thread, NULL);
     }
     exit(0);
 }
@@ -131,8 +138,8 @@ int main(int argc, char *argv[]) {
         pthread_mutex_lock(&dashboard_mutex);
         pthread_t* watchdog_thread = &dashboard[i].monitor_thread;
         service_t* service = &dashboard[i];
-        pthread_mutex_unlock(&dashboard_mutex);
         pthread_create(watchdog_thread, NULL, monitor_service, (void *)service);
+        pthread_mutex_unlock(&dashboard_mutex);  
     }
 
     // 5. Ciclo de monitoreo principal

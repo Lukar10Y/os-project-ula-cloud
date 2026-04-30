@@ -16,7 +16,8 @@ void* monitor_service(void *arg) {
     // TODO: Castear el argumento al tipo de dato correcto.
     service_t* service = (service_t *)arg;
     // TODO: Implementar la espera del proceso específico.
-    if(waitpid((*service).pid, &service->exit_status, 0) == -1) {
+    int sig;
+    if(waitpid((*service).pid, &sig, 0) == -1) {
         perror("Error en waitpid");
         return NULL;
     }
@@ -31,7 +32,7 @@ void* monitor_service(void *arg) {
      */
     pthread_mutex_lock(&dashboard_mutex);
     printf("Cambio de estado detectado para %s (PID: %d)\n", service->name, service->pid);
-    int sig = service->exit_status;
+    service->exit_status = sig;
     if(WIFEXITED(sig)) {
         if(WEXITSTATUS(sig) == 0) {
             printf("Terminó normalmente con código (%d)\n", WEXITSTATUS(sig));
