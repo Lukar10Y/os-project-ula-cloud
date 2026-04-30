@@ -138,6 +138,7 @@ int main(int argc, char *argv[]) {
         pthread_mutex_lock(&dashboard_mutex);
         pthread_t* watchdog_thread = &dashboard[i].monitor_thread;
         service_t* service = &dashboard[i];
+        //Se escoge a service como ultimo parametro del create para garantizar el uso de una estructura de datos persistente.
         pthread_create(watchdog_thread, NULL, monitor_service, (void *)service);
         pthread_mutex_unlock(&dashboard_mutex);  
     }
